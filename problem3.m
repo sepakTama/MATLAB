@@ -15,15 +15,10 @@ y = 2 * (omega * x(:, 1) + x(:, 2) + noise > 0) - 1;
 %}
 
 hold on
-%{
-for i = 1:n
-    if y(i) == -1
-        scatter(x(i, 1),x(i, 2) , 25, 'r', 'filled');
-    else
-        scatter(x(i, 1),x(i, 2) , 25, 'b', 'filled');
-    end
-end
-%}
+
+%scatter(x(y(:) == -1, 1),x(y(:) == -1, 2) , 25, 'r', 'filled');
+%scatter(x(y(:) ~= -1, 1),x(y(:) ~= -1, 2) , 25, 'b', 'filled');
+
 dual_gap = projectedGradient(x, y);
 
 hold off
@@ -63,29 +58,21 @@ function [dual_gap] = projectedGradient(x_mat, y_vec)
         prime_value = prime_value + lambda * (norm(w_hat))^2;   
         % calculate dual value
         dual_value = -(alpha_t1' * K * alpha_t1) / (4 * lambda) + dot(alpha_t1, vec_1);
+        
         dual_gap = abs(prime_value - dual_value);       
         
         scatter(iter, prime_value, 25, 'r', 'filled');
         scatter(iter, dual_value, 25, 'b', 'filled');
-%        scatter(iter, dual_gap, 25, 'k');
-
+        %scatter(iter, dual_gap, 25, 'k');
         iter = iter + 1;
     end
-
+    %fplot(@(x) -(w_hat(1)/w_hat(2))*x, 'k');
 end
 
 
-function [x_map] = mapping(x)
+function [x] = mapping(x)
 % mapping to [0,1]
-x_map = zeros(size(x));
-for i = 1:size(x, 1)
-    if x(i) > 1
-        x_map(i) = 1;
-    elseif x(i) < 0
-        x_map(i) = 0;
-    else
-        x_map(i) = x(i);
-    end
-end
+x(x(:) > 1) = 1;
+x(x(:) < 0) = 0;
 end
 
